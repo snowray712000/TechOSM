@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>example 2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="generateMap.js"></script>
+    <!-- 初始化 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+    integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+    integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+    crossorigin=""></script>
+    <!-- 一定要有height -->
+    <style>#mapid { height: 360px; }</style>
+</head>
+<body>
+    marker, 可標地名, (objpath 字串轉換為座標)<br/>
+    polyline, 畫河流, <br/>
+    polygon, 畫區域 <br/>
+    autoscale, 用 map.fitBounds <br/>
+
+    <!-- smaple 初始 衛星地圖 , 關鍵  mapbox.satellite-->
+    <div id="mapid"></div>
+    <script src="generateMap.js"></script>
+    <script>
+        var mymap = generateMap('mapid');
+    </script>
+    
+    <script src="sampleData_Gen.js"></script>
+    <script src="objpath2coordinate.js"></script>
+    <script>
+        var ajaxResult = sampleData_Gen2();
+        console.log(ajaxResult)
+
+        var a1 = ajaxResult.record[7];
+        var r1 = objpath2coordinate(a1.objpath)
+
+        // sample - 地名
+        var marker = L.marker(r1[0])
+        marker.addTo(mymap); // ex r1[0] = [23.12,41.5]
+        marker.bindTooltip(a1.cname, {
+            permanent: true,
+            direction: 'top',
+            opacity: 0.6,
+         })
+        mymap.setView(r1[0])
+
+        // sample - 河流
+        a1 = ajaxResult.record[0];
+        r1 = objpath2coordinate(a1.objpath)
+        var polyline = L.polyline(r1, {color:'#f02'}).addTo(mymap).bindTooltip(a1.cname, {
+            permanent: true,
+            direction: 'center',
+            opacity: 0.6
+         })
+         mymap.fitBounds(polyline.getBounds());
+
+        // sample - 區域
+        ajaxResult = sampleData_Gen10();
+        console.log(ajaxResult)
+        var a1 = ajaxResult.record[22];
+        var r1 = objpath2coordinate(a1.objpath)
+        var polygon = L.polygon(r1, {
+            color:'#f02',
+            fillColor: '#5f3',
+            fillOpacity: 0.5
+        }).addTo(mymap).bindTooltip(a1.cname, {
+            permanent: true,
+            direction: 'center',
+            opacity: 0.6
+         })
+         mymap.fitBounds(polygon.getBounds());
+
+    </script>
+</body>
+</html>
